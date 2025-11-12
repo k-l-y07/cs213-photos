@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="photos.controller.SearchController"
+      spacing="10">
+    <padding><Insets top="12" left="12" bottom="12" right="12"/></padding>
+
+    <Label text="Search Photos" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <ToggleGroup fx:id="modeGroup"/>
+
+    <TitledPane text="By Date Range" expanded="true">
+        <content>
+            <HBox spacing="8">
+                <RadioButton fx:id="byDateRadio" text="Use Date Range" toggleGroup="$modeGroup" selected="true"/>
+                <Label text="From (yyyy-MM-dd):"/>
+                <TextField fx:id="fromField" promptText="2025-01-01" prefWidth="120"/>
+                <Label text="To:"/>
+                <TextField fx:id="toField" promptText="2025-12-31" prefWidth="120"/>
+            </HBox>
+        </content>
+    </TitledPane>
+
+    <TitledPane text="By Tags">
+        <content>
+            <VBox spacing="6">
+                <HBox spacing="8">
+                    <RadioButton fx:id="byTagRadio" text="Use Tags" toggleGroup="$modeGroup"/>
+                    <Label text="Tag1:"/><TextField fx:id="tag1Name" promptText="name" prefWidth="100"/>
+                    <Label text="="/><TextField fx:id="tag1Value" promptText="value" prefWidth="120"/>
+                    <ChoiceBox fx:id="opChoice" prefWidth="80"/>
+                    <Label text="Tag2:"/><TextField fx:id="tag2Name" promptText="name" prefWidth="100"/>
+                    <Label text="="/><TextField fx:id="tag2Value" promptText="value" prefWidth="120"/>
+                </HBox>
+            </VBox>
+        </content>
+    </TitledPane>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button fx:id="runBtn" text="Search" onAction="#handleSearch"/>
+        <Button fx:id="createAlbumBtn" text="Create Album from Results" onAction="#handleCreateAlbum"/>
+        <Button fx:id="backBtn" text="Back" onAction="#handleBack"/>
+    </HBox>
+
+    <ListView fx:id="resultsList" prefHeight="300"/>
+</VBox>

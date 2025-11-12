@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="photos.controller.AlbumController">
+    <top>
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <padding><Insets top="10" left="10" bottom="10" right="10"/></padding>
+            <Label text="Album:"/>
+            <Label fx:id="albumNameLabel" style="-fx-font-weight: bold;"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Back" onAction="#handleBack"/>
+        </HBox>
+    </top>
+    <center>
+        <ListView fx:id="photosList"/>
+    </center>
+    <bottom>
+        <HBox spacing="8" alignment="CENTER_RIGHT">
+            <padding><Insets top="10" left="10" bottom="10" right="10"/></padding>
+            <Button fx:id="addBtn" text="Add Photo" onAction="#handleAdd"/>
+            <Button fx:id="removeBtn" text="Remove" onAction="#handleRemove"/>
+            <Button fx:id="captionBtn" text="Caption" onAction="#handleCaption"/>
+            <Button fx:id="viewBtn" text="View Info" onAction="#handleView"/>
+            <Button fx:id="tagBtn" text="Tags" onAction="#handleTags"/>
+            <Button fx:id="copyBtn" text="Copy To..." onAction="#handleCopy"/>
+            <Button fx:id="moveBtn" text="Move To..." onAction="#handleMove"/>
+        </HBox>
+    </bottom>
+</BorderPane>

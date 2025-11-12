@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="photos.controller.AdminController">
+    <top>
+        <Label text="Admin: Manage Users" style="-fx-font-size: 18px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+    </top>
+    <center>
+        <ListView fx:id="usersList"/>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <padding><Insets top="10" left="10" bottom="10" right="10"/></padding>
+            <Button fx:id="addBtn" text="Add" onAction="#handleAdd"/>
+            <Button fx:id="deleteBtn" text="Delete" onAction="#handleDelete"/>
+            <Button fx:id="backBtn" text="Back" onAction="#handleBack"/>
+        </HBox>
+    </bottom>
+</BorderPane>
