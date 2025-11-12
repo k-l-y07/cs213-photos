@@ -1,0 +1,9 @@
+{
+  "java.project.sourcePaths": [
+    "Photos69/src"
+  ],
+  "java.project.referencedLibraries": [
+    "Photos69/lib/**/*.jar"
+  ],
+  "java.project.outputPath": "Photos69/bin"
+}

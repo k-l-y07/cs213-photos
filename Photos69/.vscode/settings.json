@@ -1,0 +1,13 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "Photos69/lib/javafx.base.jar",
+        "Photos69/lib/javafx.controls.jar",
+        "Photos69/lib/javafx.fxml.jar",
+        "Photos69/lib/javafx.graphics.jar",
+        "Photos69/lib/javafx.media.jar",
+        "Photos69/lib/javafx.swing.jar",
+        "Photos69/lib/javafx.web.jar",
+        "Photos69/lib/javafx-swt.jar"
+    ]
+}

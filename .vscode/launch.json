@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch Photos69 App",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/Photos69",
+      "mainClass": "photos.Photos",
+      "vmArgs": "--module-path ${workspaceFolder}/Photos69/lib --add-modules javafx.controls,javafx.fxml,javafx.graphics"
+    }
+  ]
+}
