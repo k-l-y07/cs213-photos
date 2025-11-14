@@ -10,18 +10,22 @@
       spacing="10">
     <padding><Insets top="12" left="12" bottom="12" right="12"/></padding>
 
-    <Label text="Search Photos" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <!-- Declare non-visual objects here -->
+    <fx:define>
+        <ToggleGroup fx:id="modeGroup"/>
+    </fx:define>
 
-    <ToggleGroup fx:id="modeGroup"/>
+    <Label text="Search Photos" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
     <TitledPane text="By Date Range" expanded="true">
         <content>
             <HBox spacing="8">
-                <RadioButton fx:id="byDateRadio" text="Use Date Range" toggleGroup="$modeGroup" selected="true"/>
+                <RadioButton fx:id="byDateRadio" text="Use Date Range"
+                             toggleGroup="$modeGroup" selected="true"/>
                 <Label text="From (yyyy-MM-dd):"/>
                 <TextField fx:id="fromField" promptText="2025-01-01" prefWidth="120"/>
                 <Label text="To:"/>
-                <TextField fx:id="toField" promptText="2025-12-31" prefWidth="120"/>
+                <TextField fx:id="toField"   promptText="2025-12-31" prefWidth="120"/>
             </HBox>
         </content>
     </TitledPane>
@@ -31,11 +35,11 @@
             <VBox spacing="6">
                 <HBox spacing="8">
                     <RadioButton fx:id="byTagRadio" text="Use Tags" toggleGroup="$modeGroup"/>
-                    <Label text="Tag1:"/><TextField fx:id="tag1Name" promptText="name" prefWidth="100"/>
-                    <Label text="="/><TextField fx:id="tag1Value" promptText="value" prefWidth="120"/>
+                    <Label text="Tag1:"/><TextField fx:id="tag1Name"  promptText="name"  prefWidth="100"/>
+                    <Label text="="/><TextField fx:id="tag1Value"     promptText="value" prefWidth="120"/>
                     <ChoiceBox fx:id="opChoice" prefWidth="80"/>
-                    <Label text="Tag2:"/><TextField fx:id="tag2Name" promptText="name" prefWidth="100"/>
-                    <Label text="="/><TextField fx:id="tag2Value" promptText="value" prefWidth="120"/>
+                    <Label text="Tag2:"/><TextField fx:id="tag2Name"  promptText="name"  prefWidth="100"/>
+                    <Label text="="/><TextField fx:id="tag2Value"     promptText="value" prefWidth="120"/>
                 </HBox>
             </VBox>
         </content>

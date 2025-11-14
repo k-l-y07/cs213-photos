@@ -2,7 +2,6 @@ package photos.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import photos.Photos;
 import photos.model.AppState;
@@ -10,7 +9,6 @@ import photos.model.User;
 
 public class LoginController {
     @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField; // optional (not graded)
 
     @FXML
     private void handleLogin() {

@@ -14,6 +14,5 @@
     <Label text="Photos" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
     <Label text="Enter username to log in (admin for admin panel):"/>
     <TextField fx:id="usernameField" promptText="Username" maxWidth="220"/>
-    <PasswordField fx:id="passwordField" promptText="(Optional) Password" maxWidth="220"/>
     <Button text="Login" onAction="#handleLogin" maxWidth="220"/>
 </VBox>
