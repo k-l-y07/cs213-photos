@@ -104,7 +104,7 @@ public class SearchController {
     @FXML private void handleBack() { Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums"); }
 
     private boolean hasTag(Photo p, String name, String value) {
-        return p.tags.stream().anyMatch(t -> t.name.equalsIgnoreCase(name) && t.value.equalsIgnoreCase(value));
+        return p.tags.stream().anyMatch(t -> t.name.equalsIgnoreCase(name) || t.value.equalsIgnoreCase(value));
     }
 
     private Date parseDate(String s) {
