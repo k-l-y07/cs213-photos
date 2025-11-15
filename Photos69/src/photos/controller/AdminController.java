@@ -1,5 +1,7 @@
 package photos.controller;
 
+import javax.swing.text.html.ListView;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -8,6 +10,17 @@ import photos.Photos;
 import photos.model.AppState;
 import photos.model.User;
 
+/**
+ * Controller for the administration view where users can be listed,
+ * created, and deleted.
+ *
+ * The admin view does not represent a normal user account; it only
+ * manages the set of users persisted in application state.
+ *
+ * @author Kenneth Yan
+ * @author Wilmer Joya
+ * @version 1.0
+ */
 public class AdminController {
     @FXML private ListView<User> usersList;
     @FXML private Button addBtn, deleteBtn, backBtn;
@@ -35,6 +48,7 @@ public class AdminController {
             User user = new User(u);
             AppState.get().users.add(user);
             data.add(user);
+            AppState.get().save();
         });
     }
 
@@ -45,6 +59,7 @@ public class AdminController {
         if (confirm("Delete user '" + sel.username + "'?")) {
             AppState.get().users.remove(sel);
             data.remove(sel);
+            AppState.get().save();
         }
     }
 

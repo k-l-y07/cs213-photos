@@ -12,6 +12,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.swing.text.html.ListView;
+
+/**
+ * Controller for searching photos by date range or by up to two tag name/value
+ * pairs. Search results are displayed as a list of photos and may be saved into
+ * a new album.
+ *
+ * @author Kenneth Yan
+ * @author Wilmer Joya
+ * @version 1.0
+ */
 public class SearchController {
     @FXML private ToggleGroup modeGroup;
     @FXML private RadioButton byDateRadio, byTagRadio;
@@ -97,6 +108,7 @@ public class SearchController {
             // copy photo references (same physical photo)
             a.photos.addAll(results);
             u.albums.add(a);
+            AppState.get().save();
             alert("Created album '" + n + "' with " + results.size() + " photos.");
         });
     }
@@ -104,7 +116,7 @@ public class SearchController {
     @FXML private void handleBack() { Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums"); }
 
     private boolean hasTag(Photo p, String name, String value) {
-        return p.tags.stream().anyMatch(t -> t.name.equalsIgnoreCase(name) || t.value.equalsIgnoreCase(value));
+        return p.tags.stream().anyMatch(t -> t.name.equalsIgnoreCase(name) && t.value.equalsIgnoreCase(value));
     }
 
     private Date parseDate(String s) {

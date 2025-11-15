@@ -7,6 +7,16 @@ import photos.Photos;
 import photos.model.AppState;
 import photos.model.User;
 
+/**
+ * Controller for the login view. Handles logging in as a user or entering the
+ * admin view.
+ *
+ * Auto-creates a user if the username does not exist in the saved state.
+ *
+ * @author Kenneth Yan
+ * @author Wilmer Joya
+ * @version 1.0
+ */
 public class LoginController {
     @FXML private TextField usernameField;
 
@@ -23,11 +33,12 @@ public class LoginController {
             return;
         }
 
-        // auto-create user if doesn't exist (for testing; you can require admin to make users instead)
+        // auto-create user if doesn't exist
         User user = AppState.get().users.stream().filter(x -> x.username.equals(u)).findFirst().orElse(null);
         if (user == null) {
             user = new User(u);
             AppState.get().users.add(user);
+            AppState.get().save();
         }
         AppState.get().currentUser = user;
         Photos.switchScene("/photos/view/user_home.fxml", "Photos - " + u + " (Albums)");

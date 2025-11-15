@@ -13,6 +13,17 @@ import photos.model.User;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.table.TableColumn;
+import javax.swing.text.TableView;
+
+/**
+ * Controller for the user's home view which lists the user's albums and allows
+ * creating, renaming, deleting, and opening albums.
+ *
+ * @author Kenneth Yan
+ * @author Wilmer Joya
+ * @version 1.0
+ */
 public class UserHomeController {
     @FXML private TableView<Album> albumsTable;
     @FXML private TableColumn<Album, String> nameCol, countCol, rangeCol;
@@ -53,6 +64,7 @@ public class UserHomeController {
             Album a = new Album(name);
             AppState.get().currentUser.albums.add(a);
             data.add(a);
+            AppState.get().save();
         });
     }
 
@@ -72,6 +84,7 @@ public class UserHomeController {
             }
             sel.name = name;
             albumsTable.refresh();
+            AppState.get().save();
         });
     }
 
@@ -82,6 +95,7 @@ public class UserHomeController {
         if (confirm("Delete album '" + sel.name + "'?")) {
             AppState.get().currentUser.albums.remove(sel);
             data.remove(sel);
+            AppState.get().save();
         }
     }
 
@@ -99,6 +113,7 @@ public class UserHomeController {
     @FXML
     private void handleLogout() {
         AppState.get().currentUser = null;
+        AppState.get().save();
         Photos.switchScene("/photos/view/login.fxml", "Photos - Login");
     }
 

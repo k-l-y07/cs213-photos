@@ -9,6 +9,18 @@ import photos.model.*;
 import java.io.File;
 import java.util.Optional;
 
+import javax.swing.text.html.ListView;
+
+/**
+ * Controller for viewing and manipulating photos within a single album.
+ *
+ * Provides UI handlers to add/remove photos, edit captions and tags, view
+ * photo metadata, and copy/move photos between albums.
+ *
+ * @author Kenneth Yan
+ * @author Wilmer Joya
+ * @version 1.0
+ */
 public class AlbumController {
     @FXML private Label albumNameLabel;
     @FXML private ListView<Photo> photosList;
@@ -46,6 +58,7 @@ public class AlbumController {
         Photo p = new Photo(path);
         currentAlbum.photos.add(p);
         photosList.getItems().add(p);
+        AppState.get().save();
     }
 
     @FXML
@@ -55,6 +68,7 @@ public class AlbumController {
         if (confirm("Remove this photo from album?")) {
             currentAlbum.photos.remove(sel);
             photosList.getItems().remove(sel);
+            AppState.get().save();
         }
     }
 
@@ -66,6 +80,7 @@ public class AlbumController {
         d.setHeaderText("Set Caption");
         d.setContentText("Caption:");
         d.showAndWait().ifPresent(c -> { sel.caption = c.trim(); photosList.refresh(); });
+        AppState.get().save();
     }
 
     @FXML
@@ -106,6 +121,7 @@ public class AlbumController {
             currentAlbum.photos.remove(sel);
             photosList.getItems().remove(sel);
         }
+        AppState.get().save();
     }
 
     @FXML
@@ -131,11 +147,13 @@ public class AlbumController {
                     if (!exists) sel.tags.add(tag);
                 }
             });
+            AppState.get().save();
         } else {
             ChoiceDialog<Tag> del = new ChoiceDialog<>();
             del.setHeaderText("Delete Tag");
             del.getItems().addAll(sel.tags);
             del.showAndWait().ifPresent(t -> sel.tags.remove(t));
+            AppState.get().save();
         }
     }
 
