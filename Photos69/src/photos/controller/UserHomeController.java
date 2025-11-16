@@ -14,6 +14,12 @@ import photos.model.User;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Controller for the user home screen.
+ * Manages the display and operations on the user's albums.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class UserHomeController {
     @FXML private TableView<Album> albumsTable;
     @FXML private TableColumn<Album, String> nameCol;
@@ -30,6 +36,9 @@ public class UserHomeController {
     private final ObservableList<Album> data = FXCollections.observableArrayList();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
+    /**
+     * Initializes the controller by populating the album table with the user's albums.
+     */
     @FXML
     private void initialize() {
         User user = AppState.get().currentUser;
@@ -41,6 +50,12 @@ public class UserHomeController {
         rangeCol.setCellValueFactory(c -> new SimpleStringProperty(range(c.getValue())));
     }
 
+    /**
+     * Computes the date range of an album.
+     * 
+     * @param a the album
+     * @return the date range as a string, or "-" if the album is empty
+     */
     private String range(Album a) {
         Date lo = a.earliestDate();
         Date hi = a.latestDate();
@@ -48,6 +63,10 @@ public class UserHomeController {
         return sdf.format(lo) + "  to  " + sdf.format(hi);
     }
 
+    /**
+     * Handles the addition of a new album.
+     * Prompts the user for the album name and adds it to the user's albums.
+     */
     @FXML
     private void handleAdd() {
         TextInputDialog d = new TextInputDialog();
@@ -71,6 +90,10 @@ public class UserHomeController {
         });
     }
 
+    /**
+     * Handles renaming an existing album.
+     * Prompts the user for a new name and updates the album.
+     */
     @FXML
     private void handleRename() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
@@ -96,6 +119,10 @@ public class UserHomeController {
         });
     }
 
+    /**
+     * Handles deleting an album.
+     * Prompts the user for confirmation before removing the album.
+     */
     @FXML
     private void handleDelete() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
@@ -108,6 +135,10 @@ public class UserHomeController {
         }
     }
 
+    /**
+     * Handles opening an album.
+     * Switches to the album view for the selected album.
+     */
     @FXML
     private void handleOpen() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
@@ -117,17 +148,31 @@ public class UserHomeController {
         Photos.switchScene("/photos/view/album.fxml", "Album - " + sel.name);
     }
 
+    /**
+     * Handles the search operation.
+     * Switches to the search view.
+     */
     @FXML
     private void handleSearch() {
         Photos.switchScene("/photos/view/search.fxml", "Search Photos");
     }
 
+    /**
+     * Handles logging out.
+     * Clears the current user session and switches to the login view.
+     */
     @FXML
     private void handleLogout() {
         AppState.get().currentUser = null;
         Photos.switchScene("/photos/view/login.fxml", "Photos - Login");
     }
 
+    /**
+     * Displays a confirmation dialog with the specified message.
+     * 
+     * @param msg the message to display
+     * @return true if the user confirms, false otherwise
+     */
     private boolean confirm(String msg) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg,
                 ButtonType.OK, ButtonType.CANCEL);

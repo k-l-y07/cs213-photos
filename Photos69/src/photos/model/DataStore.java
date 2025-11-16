@@ -4,7 +4,15 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
+/**
+ * Handles data persistence for the Photos application.
+ * Manages saving and loading user data, as well as initializing default data.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class DataStore {
     private static final String DATA_DIR = "data";
     private static final String USERS_FILE = "users.dat";
@@ -23,14 +31,15 @@ public class DataStore {
     }
 
     /**
-     * Call this once at app startup.
-     * Loads users from disk if present, otherwise initializes defaults (admin + stock).
+     * Initializes the data store by loading users from disk if present,
+     * or creating default users and albums if no data exists.
      */
     public static void loadOrInit() {
         try {
             Files.createDirectories(dataDir());
         } catch (IOException e) {
-            e.printStackTrace();
+            final String msg = "Failed to create data directory: " + e.getMessage();
+            Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, msg).showAndWait());
         }
 
         if (Files.exists(usersFile())) {
@@ -41,6 +50,9 @@ public class DataStore {
         }
     }
 
+    /**
+     * Saves the current list of users to disk.
+     */
     public static void saveUsers() {
         try (ObjectOutputStream oos =
                      new ObjectOutputStream(Files.newOutputStream(usersFile()))) {
@@ -48,10 +60,15 @@ public class DataStore {
             oos.writeObject(new ArrayList<>(AppState.get().users));
 
         } catch (IOException e) {
-            e.printStackTrace();
+            final String msg = "Failed to save user data: " + e.getMessage();
+            Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, msg).showAndWait());
         }
     }
 
+    /**
+     * Loads the list of users from disk.
+     * If the data is corrupted, default users are created.
+     */
     @SuppressWarnings("unchecked")
     private static void loadUsers() {
         try (ObjectInputStream ois =
@@ -61,13 +78,18 @@ public class DataStore {
             AppState.get().setUsers(loaded);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            final String msg = "Failed to load user data (using defaults): " + e.getMessage();
+            Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, msg).showAndWait());
             // If something is badly corrupted, fall back to defaults.
             createDefaultUsers();
             saveUsers();
         }
     }
 
+    /**
+     * Creates default users and albums for the application.
+     * Includes an admin user and a stock user with sample photos.
+     */
     private static void createDefaultUsers() {
         AppState state = AppState.get();
         state.users.clear();
@@ -102,7 +124,8 @@ public class DataStore {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            final String msg = "Error initializing stock photos: " + e.getMessage();
+            Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, msg).showAndWait());
         }
     }
 }

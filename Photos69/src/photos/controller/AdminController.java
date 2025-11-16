@@ -9,6 +9,14 @@ import photos.model.AppState;
 import photos.model.DataStore;
 import photos.model.User;
 
+/**
+ * Controller for the admin screen.
+ *
+ * <p>Provides UI actions for listing users, creating new users, and deleting users.
+ * The controller updates the application state and persists changes via {@code DataStore}.</p>
+ *
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class AdminController {
     @FXML private ListView<User> usersList;
     @FXML private Button addBtn;
@@ -50,6 +58,12 @@ public class AdminController {
     private void handleDelete() {
         User sel = usersList.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
+        // Prevent deleting critical accounts
+        if (sel.username.equalsIgnoreCase("admin") || sel.username.equalsIgnoreCase("stock")) {
+            new Alert(Alert.AlertType.ERROR, "Cannot delete protected user '" + sel.username + "'.").showAndWait();
+            return;
+        }
 
         if (confirm("Delete user '" + sel.username + "'?")) {
             AppState.get().users.remove(sel);

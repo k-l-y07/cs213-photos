@@ -9,6 +9,12 @@ import photos.model.*;
 import java.io.File;
 import java.util.Optional;
 
+/**
+ * Controller for the album screen.
+ * Manages the display and operations on photos within an album.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class AlbumController {
     @FXML private Label albumNameLabel;
     @FXML private ListView<Photo> photosList;
@@ -23,10 +29,18 @@ public class AlbumController {
 
     private static Album currentAlbum;
 
+    /**
+     * Sets the current album to be displayed and managed.
+     * 
+     * @param a the album to set as the current album
+     */
     public static void setCurrentAlbum(Album a) {
         currentAlbum = a;
     }
 
+    /**
+     * Initializes the controller by populating the photo list with the current album's photos.
+     */
     @FXML
     private void initialize() {
         if (currentAlbum == null) {
@@ -38,6 +52,10 @@ public class AlbumController {
         photosList.setCellFactory(list -> new PhotoCell());
     }
 
+    /**
+     * Handles adding a new photo to the album.
+     * Prompts the user to select a photo file and adds it to the album.
+     */
     @FXML
     private void handleAdd() {
         FileChooser fc = new FileChooser();
@@ -60,6 +78,10 @@ public class AlbumController {
         DataStore.saveUsers();   // persist new photo
     }
 
+    /**
+     * Handles removing a photo from the album.
+     * Prompts the user for confirmation before removing the photo.
+     */
     @FXML
     private void handleRemove() {
         Photo sel = photosList.getSelectionModel().getSelectedItem();
@@ -72,6 +94,10 @@ public class AlbumController {
         }
     }
 
+    /**
+     * Handles setting or updating the caption of a photo.
+     * Prompts the user for a new caption and updates the photo.
+     */
     @FXML
     private void handleCaption() {
         Photo sel = photosList.getSelectionModel().getSelectedItem();
@@ -87,30 +113,50 @@ public class AlbumController {
         });
     }
 
+    /**
+     * Handles viewing detailed information about a photo.
+     * Displays the photo's path, date, and tags in an alert dialog.
+     */
     @FXML
     private void handleView() {
         Photo sel = photosList.getSelectionModel().getSelectedItem();
-        if (sel == null) return;
+        int idx = photosList.getSelectionModel().getSelectedIndex();
+        if (sel == null || idx < 0) return;
 
-        Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Photo Info");
-        info.setHeaderText(sel.toString());
-        info.setContentText("Path: " + sel.path +
-                "\nDate: " + sel.date +
-                "\nTags: " + sel.tags);
-        info.showAndWait();
+        // open dedicated photo viewer with slideshow controls
+        PhotoViewerController.setStartIndex(idx);
+        Photos.switchScene("/photos/view/viewer.fxml", "Photo Viewer - " + currentAlbum.name);
     }
 
+    /**
+     * Gets the current album being shown in this controller.
+     * @return the current Album
+     */
+    public static Album getCurrentAlbum() {
+        return currentAlbum;
+    }
+
+    /**
+     * Handles copying a photo to another album.
+     */
     @FXML
     private void handleCopy() {
         moveOrCopy(false);
     }
 
+    /**
+     * Handles moving a photo to another album.
+     */
     @FXML
     private void handleMove() {
         moveOrCopy(true);
     }
 
+    /**
+     * Handles moving or copying a photo to another album.
+     * 
+     * @param move true if the photo should be moved, false if it should be copied
+     */
     private void moveOrCopy(boolean move) {
         Photo sel = photosList.getSelectionModel().getSelectedItem();
         if (sel == null) return;
@@ -167,6 +213,11 @@ public class AlbumController {
                 }
             });
         } else {
+            if (sel.tags.isEmpty()) {
+                new Alert(Alert.AlertType.INFORMATION, "This photo has no tags.").showAndWait();
+                return;
+            }
+
             ChoiceDialog<Tag> del = new ChoiceDialog<>();
             del.setHeaderText("Delete Tag");
             del.getItems().addAll(sel.tags);
@@ -177,11 +228,20 @@ public class AlbumController {
         }
     }
 
+    /**
+     * Handles navigating back to the user home screen.
+     */
     @FXML
     private void handleBack() {
         Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums");
     }
 
+    /**
+     * Displays a confirmation dialog with the specified message.
+     * 
+     * @param msg the message to display
+     * @return true if the user confirms, false otherwise
+     */
     private boolean confirm(String msg) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg,
                 ButtonType.OK, ButtonType.CANCEL);

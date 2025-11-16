@@ -12,6 +12,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for the search screen.
+ * Handles searching photos by date range or tags and creating albums from search results.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class SearchController {
     @FXML private ToggleGroup modeGroup;
     @FXML private RadioButton byDateRadio;
@@ -36,6 +42,9 @@ public class SearchController {
     private final ObservableList<Photo> results = FXCollections.observableArrayList();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * Initializes the controller by setting up the UI components.
+     */
     @FXML
     private void initialize() {
         opChoice.getItems().addAll("AND", "OR");
@@ -44,6 +53,10 @@ public class SearchController {
         resultsList.setCellFactory(l -> new PhotoCell());
     }
 
+    /**
+     * Handles the search operation based on the selected mode (date range or tags).
+     * Filters photos and displays the results in the list view.
+     */
     @FXML
     private void handleSearch() {
         results.clear();
@@ -56,8 +69,14 @@ public class SearchController {
                 alert("Enter dates as yyyy-MM-dd.");
                 return;
             }
-            results.addAll(allPhotos.stream()
-                    .filter(p -> !p.date.before(lo) && !p.date.after(hi))
+                // Make the 'hi' date inclusive for the whole day (end of day)
+                long hiEnd = hi.getTime() + 24L * 60 * 60 * 1000 - 1;
+                long loTime = lo.getTime();
+                results.addAll(allPhotos.stream()
+                    .filter(p -> {
+                    long t = p.date.getTime();
+                    return t >= loTime && t <= hiEnd;
+                    })
                     .collect(Collectors.toList()));
         } else {
             String n1 = tag1Name.getText().trim();
@@ -95,6 +114,10 @@ public class SearchController {
         }
     }
 
+    /**
+     * Handles creating a new album from the search results.
+     * Prompts the user for an album name and saves the results as a new album.
+     */
     @FXML
     private void handleCreateAlbum() {
         if (results.isEmpty()) {
@@ -125,17 +148,34 @@ public class SearchController {
         });
     }
 
+    /**
+     * Handles navigating back to the user home screen.
+     */
     @FXML
     private void handleBack() {
         Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums");
     }
 
+    /**
+     * Checks if a photo has a specific tag.
+     * 
+     * @param p the photo
+     * @param name the tag name
+     * @param value the tag value
+     * @return true if the photo has the tag, false otherwise
+     */
     private boolean hasTag(Photo p, String name, String value) {
         return p.tags.stream()
                 .anyMatch(t -> t.name.equalsIgnoreCase(name)
                         && t.value.equalsIgnoreCase(value));
     }
 
+    /**
+     * Parses a date string in the format yyyy-MM-dd.
+     * 
+     * @param s the date string
+     * @return the parsed date, or null if parsing fails
+     */
     private Date parseDate(String s) {
         try {
             return sdf.parse(s.trim());
@@ -144,6 +184,11 @@ public class SearchController {
         }
     }
 
+    /**
+     * Retrieves all photos from all albums of the current user.
+     * 
+     * @return a list of all photos
+     */
     private List<Photo> allUserPhotos() {
         User u = AppState.get().currentUser;
         Set<Photo> set = new LinkedHashSet<>();
@@ -151,6 +196,11 @@ public class SearchController {
         return new ArrayList<>(set);
     }
 
+    /**
+     * Displays an alert dialog with the specified message.
+     * 
+     * @param msg the message to display
+     */
     private void alert(String msg) {
         new Alert(Alert.AlertType.INFORMATION, msg).showAndWait();
     }

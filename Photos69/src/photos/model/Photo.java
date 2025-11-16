@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Represents a photo in the Photos application.
+ * Each photo has a file path, caption, date, and associated tags.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class Photo implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -16,13 +22,23 @@ public class Photo implements Serializable {
     public final Date date;       // file last-modified as proxy
     public final List<Tag> tags = new ArrayList<>();
 
+    /**
+     * Constructs a new Photo with the specified file path.
+     * The date is set to the file's last modified date.
+     * 
+     * @param path the absolute file path of the photo
+     */
     public Photo(String path) {
         this.path = path;
         File f = new File(path);
         this.date = new Date(f.lastModified());
     }
 
-    // Not serialized; computed on demand
+    /**
+     * Loads a thumbnail image for the photo.
+     * 
+     * @return the thumbnail image, or null if loading fails
+     */
     public Image loadThumb() {
         try {
             return new Image(new File(path).toURI().toString(),
@@ -32,6 +48,12 @@ public class Photo implements Serializable {
         }
     }
 
+    /**
+     * Returns a string representation of the photo.
+     * If a caption is set, it is returned; otherwise, the file name is returned.
+     * 
+     * @return the string representation of the photo
+     */
     @Override
     public String toString() {
         if (caption == null || caption.isEmpty()) {

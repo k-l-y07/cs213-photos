@@ -9,10 +9,20 @@ import photos.model.AppState;
 import photos.model.DataStore;
 import photos.model.User;
 
+/**
+ * Controller for the login screen.
+ * Handles user authentication and navigation to the appropriate screen.
+ * 
+ * <p>Authors: Wilmer Joya, Kenneth Yan</p>
+ */
 public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField; // optional; not used for logic
 
+    /**
+     * Handles the login operation.
+     * Authenticates the user and navigates to the user home or admin screen.
+     */
     @FXML
     private void handleLogin() {
         String u = usernameField.getText().trim();

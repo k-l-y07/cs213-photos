@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="photos.controller.PhotoViewerController">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="8" left="8" bottom="8" right="8"/></padding>
+            <Label fx:id="captionLabel" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label fx:id="dateLabel" />
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
+            <StackPane>
+                <ImageView fx:id="imageView" preserveRatio="true" />
+            </StackPane>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <VBox spacing="8">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <padding><Insets top="6" left="6" bottom="0" right="6"/></padding>
+                <Label text="Tags:" />
+                <Label fx:id="tagsLabel" />
+            </HBox>
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <padding><Insets top="6" left="6" bottom="6" right="6"/></padding>
+                <Button fx:id="prevBtn" text="Previous" onAction="#handlePrev" />
+                <Button fx:id="nextBtn" text="Next" onAction="#handleNext" />
+                <Button fx:id="editCaptionBtn" text="Edit Caption" onAction="#handleEditCaption" />
+                <Button fx:id="tagsBtn" text="Tags" onAction="#handleTags" />
+                <Button fx:id="closeBtn" text="Close" onAction="#handleClose" />
+            </HBox>
+        </VBox>
+    </bottom>
+</BorderPane>
