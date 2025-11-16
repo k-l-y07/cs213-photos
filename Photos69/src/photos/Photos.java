@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import photos.model.DataStore;
 
 public class Photos extends Application {
     private static Stage primaryStage;
@@ -11,8 +12,16 @@ public class Photos extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
+
+        // Load existing users or create defaults (admin + stock)
+        DataStore.loadOrInit();
+
         switchScene("/photos/view/login.fxml", "Photos - Login");
         stage.setResizable(false);
+
+        // Safe quit: save user data on window close
+        stage.setOnCloseRequest(e -> DataStore.saveUsers());
+
         stage.show();
     }
 
@@ -27,7 +36,11 @@ public class Photos extends Application {
         }
     }
 
-    public static Stage getPrimaryStage() { return primaryStage; }
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
-    public static void main(String[] args) { launch(args); }
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

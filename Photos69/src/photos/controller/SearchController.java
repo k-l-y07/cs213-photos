@@ -14,17 +14,24 @@ import java.util.stream.Collectors;
 
 public class SearchController {
     @FXML private ToggleGroup modeGroup;
-    @FXML private RadioButton byDateRadio, byTagRadio;
+    @FXML private RadioButton byDateRadio;
+    @FXML private RadioButton byTagRadio;
 
     // by date
-    @FXML private TextField fromField, toField; // yyyy-MM-dd
+    @FXML private TextField fromField;
+    @FXML private TextField toField;
 
-    // by tag (up to two, with AND/OR)
-    @FXML private TextField tag1Name, tag1Value, tag2Name, tag2Value;
+    // by tags
+    @FXML private TextField tag1Name;
+    @FXML private TextField tag1Value;
+    @FXML private TextField tag2Name;
+    @FXML private TextField tag2Value;
     @FXML private ChoiceBox<String> opChoice;
 
     @FXML private ListView<Photo> resultsList;
-    @FXML private Button runBtn, createAlbumBtn, backBtn;
+    @FXML private Button runBtn;
+    @FXML private Button createAlbumBtn;
+    @FXML private Button backBtn;
 
     private final ObservableList<Photo> results = FXCollections.observableArrayList();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -53,17 +60,26 @@ public class SearchController {
                     .filter(p -> !p.date.before(lo) && !p.date.after(hi))
                     .collect(Collectors.toList()));
         } else {
-            String n1 = tag1Name.getText().trim(), v1 = tag1Value.getText().trim();
-            String n2 = tag2Name.getText().trim(), v2 = tag2Value.getText().trim();
+            String n1 = tag1Name.getText().trim();
+            String v1 = tag1Value.getText().trim();
+            String n2 = tag2Name.getText().trim();
+            String v2 = tag2Value.getText().trim();
             boolean has1 = !n1.isEmpty() && !v1.isEmpty();
             boolean has2 = !n2.isEmpty() && !v2.isEmpty();
 
-            if (!has1 && !has2) { alert("Enter at least one tag name=value."); return; }
+            if (!has1 && !has2) {
+                alert("Enter at least one tag name=value.");
+                return;
+            }
 
             if (has1 && !has2) {
-                results.addAll(allPhotos.stream().filter(p -> hasTag(p, n1, v1)).collect(Collectors.toList()));
+                results.addAll(allPhotos.stream()
+                        .filter(p -> hasTag(p, n1, v1))
+                        .collect(Collectors.toList()));
             } else if (!has1) {
-                results.addAll(allPhotos.stream().filter(p -> hasTag(p, n2, v2)).collect(Collectors.toList()));
+                results.addAll(allPhotos.stream()
+                        .filter(p -> hasTag(p, n2, v2))
+                        .collect(Collectors.toList()));
             } else {
                 String op = opChoice.getValue();
                 if ("AND".equals(op)) {
@@ -81,34 +97,51 @@ public class SearchController {
 
     @FXML
     private void handleCreateAlbum() {
-        if (results.isEmpty()) { alert("No results to save."); return; }
+        if (results.isEmpty()) {
+            alert("No results to save.");
+            return;
+        }
+
         TextInputDialog d = new TextInputDialog("Search Results");
         d.setHeaderText("Create Album from Results");
         d.setContentText("Album name:");
         d.showAndWait().ifPresent(name -> {
             String n = name.trim();
             if (n.isEmpty()) return;
+
             User u = AppState.get().currentUser;
-            if (u.albums.stream().anyMatch(a -> a.name.equalsIgnoreCase(n))) {
+            boolean exists = u.albums.stream()
+                    .anyMatch(a -> a.name.equalsIgnoreCase(n));
+            if (exists) {
                 alert("Album already exists.");
                 return;
             }
+
             Album a = new Album(n);
-            // copy photo references (same physical photo)
-            a.photos.addAll(results);
+            a.photos.addAll(results);   // same physical photos
             u.albums.add(a);
+            DataStore.saveUsers();      // persist new album
             alert("Created album '" + n + "' with " + results.size() + " photos.");
         });
     }
 
-    @FXML private void handleBack() { Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums"); }
+    @FXML
+    private void handleBack() {
+        Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums");
+    }
 
     private boolean hasTag(Photo p, String name, String value) {
-        return p.tags.stream().anyMatch(t -> t.name.equalsIgnoreCase(name) || t.value.equalsIgnoreCase(value));
+        return p.tags.stream()
+                .anyMatch(t -> t.name.equalsIgnoreCase(name)
+                        && t.value.equalsIgnoreCase(value));
     }
 
     private Date parseDate(String s) {
-        try { return sdf.parse(s.trim()); } catch (ParseException e) { return null; }
+        try {
+            return sdf.parse(s.trim());
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     private List<Photo> allUserPhotos() {
@@ -118,5 +151,7 @@ public class SearchController {
         return new ArrayList<>(set);
     }
 
-    private void alert(String m) { new Alert(Alert.AlertType.INFORMATION, m).showAndWait(); }
+    private void alert(String msg) {
+        new Alert(Alert.AlertType.INFORMATION, msg).showAndWait();
+    }
 }

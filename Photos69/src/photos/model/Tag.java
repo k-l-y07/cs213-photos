@@ -1,6 +1,10 @@
 package photos.model;
 
-public class Tag {
+import java.io.Serializable;
+
+public class Tag implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public final String name;
     public final String value;
 
@@ -9,5 +13,8 @@ public class Tag {
         this.value = value;
     }
 
-    @Override public String toString() { return name + "=" + value; }
+    @Override
+    public String toString() {
+        return name + "=" + value;
+    }
 }

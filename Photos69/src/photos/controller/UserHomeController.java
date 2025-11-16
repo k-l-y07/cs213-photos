@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import photos.Photos;
 import photos.model.Album;
 import photos.model.AppState;
+import photos.model.DataStore;
 import photos.model.User;
 
 import java.text.SimpleDateFormat;
@@ -15,8 +16,16 @@ import java.util.Date;
 
 public class UserHomeController {
     @FXML private TableView<Album> albumsTable;
-    @FXML private TableColumn<Album, String> nameCol, countCol, rangeCol;
-    @FXML private Button addBtn, renameBtn, deleteBtn, openBtn, searchBtn, logoutBtn;
+    @FXML private TableColumn<Album, String> nameCol;
+    @FXML private TableColumn<Album, String> countCol;
+    @FXML private TableColumn<Album, String> rangeCol;
+
+    @FXML private Button addBtn;
+    @FXML private Button renameBtn;
+    @FXML private Button deleteBtn;
+    @FXML private Button openBtn;
+    @FXML private Button searchBtn;
+    @FXML private Button logoutBtn;
 
     private final ObservableList<Album> data = FXCollections.observableArrayList();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -33,7 +42,8 @@ public class UserHomeController {
     }
 
     private String range(Album a) {
-        Date lo = a.earliestDate(), hi = a.latestDate();
+        Date lo = a.earliestDate();
+        Date hi = a.latestDate();
         if (lo == null || hi == null) return "-";
         return sdf.format(lo) + "  to  " + sdf.format(hi);
     }
@@ -46,13 +56,18 @@ public class UserHomeController {
         d.showAndWait().ifPresent(n -> {
             String name = n.trim();
             if (name.isEmpty()) return;
-            if (AppState.get().currentUser.albums.stream().anyMatch(a -> a.name.equalsIgnoreCase(name))) {
+
+            boolean exists = AppState.get().currentUser.albums.stream()
+                    .anyMatch(a -> a.name.equalsIgnoreCase(name));
+            if (exists) {
                 new Alert(Alert.AlertType.ERROR, "Album already exists").showAndWait();
                 return;
             }
+
             Album a = new Album(name);
             AppState.get().currentUser.albums.add(a);
             data.add(a);
+            DataStore.saveUsers();   // persist albums
         });
     }
 
@@ -60,18 +75,24 @@ public class UserHomeController {
     private void handleRename() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
         TextInputDialog d = new TextInputDialog(sel.name);
         d.setHeaderText("Rename Album");
         d.setContentText("New name:");
         d.showAndWait().ifPresent(n -> {
             String name = n.trim();
             if (name.isEmpty()) return;
-            if (AppState.get().currentUser.albums.stream().anyMatch(a -> a != sel && a.name.equalsIgnoreCase(name))) {
+
+            boolean exists = AppState.get().currentUser.albums.stream()
+                    .anyMatch(a -> a != sel && a.name.equalsIgnoreCase(name));
+            if (exists) {
                 new Alert(Alert.AlertType.ERROR, "Album already exists").showAndWait();
                 return;
             }
+
             sel.name = name;
             albumsTable.refresh();
+            DataStore.saveUsers();   // persist rename
         });
     }
 
@@ -79,9 +100,11 @@ public class UserHomeController {
     private void handleDelete() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
         if (confirm("Delete album '" + sel.name + "'?")) {
             AppState.get().currentUser.albums.remove(sel);
             data.remove(sel);
+            DataStore.saveUsers();   // persist delete
         }
     }
 
@@ -89,12 +112,15 @@ public class UserHomeController {
     private void handleOpen() {
         Album sel = albumsTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
         AlbumController.setCurrentAlbum(sel);
         Photos.switchScene("/photos/view/album.fxml", "Album - " + sel.name);
     }
 
     @FXML
-    private void handleSearch() { Photos.switchScene("/photos/view/search.fxml", "Search Photos"); }
+    private void handleSearch() {
+        Photos.switchScene("/photos/view/search.fxml", "Search Photos");
+    }
 
     @FXML
     private void handleLogout() {
@@ -103,7 +129,8 @@ public class UserHomeController {
     }
 
     private boolean confirm(String msg) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.OK, ButtonType.CANCEL);
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg,
+                ButtonType.OK, ButtonType.CANCEL);
         return a.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
     }
 }

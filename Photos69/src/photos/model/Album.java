@@ -1,23 +1,40 @@
 package photos.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Album {
+public class Album implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public String name;
     public final List<Photo> photos = new ArrayList<>();
 
-    public Album(String name) { this.name = name; }
+    public Album(String name) {
+        this.name = name;
+    }
 
-    public int size() { return photos.size(); }
+    public int size() {
+        return photos.size();
+    }
 
     public Date earliestDate() {
-        return photos.stream().map(p -> p.date).min(Date::compareTo).orElse(null);
-    }
-    public Date latestDate() {
-        return photos.stream().map(p -> p.date).max(Date::compareTo).orElse(null);
+        return photos.stream()
+                .map(p -> p.date)
+                .min(Date::compareTo)
+                .orElse(null);
     }
 
-    @Override public String toString() { return name; }
+    public Date latestDate() {
+        return photos.stream()
+                .map(p -> p.date)
+                .max(Date::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

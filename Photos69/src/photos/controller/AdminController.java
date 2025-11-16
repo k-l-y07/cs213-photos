@@ -6,11 +6,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import photos.Photos;
 import photos.model.AppState;
+import photos.model.DataStore;
 import photos.model.User;
 
 public class AdminController {
     @FXML private ListView<User> usersList;
-    @FXML private Button addBtn, deleteBtn, backBtn;
+    @FXML private Button addBtn;
+    @FXML private Button deleteBtn;
+    @FXML private Button backBtn;
 
     private final ObservableList<User> data = FXCollections.observableArrayList();
 
@@ -28,13 +31,18 @@ public class AdminController {
         d.showAndWait().ifPresent(name -> {
             String u = name.trim();
             if (u.isEmpty()) return;
-            if (AppState.get().users.stream().anyMatch(x -> x.username.equals(u))) {
+
+            boolean exists = AppState.get().users.stream()
+                    .anyMatch(x -> x.username.equals(u));
+            if (exists) {
                 new Alert(Alert.AlertType.ERROR, "User already exists").showAndWait();
                 return;
             }
+
             User user = new User(u);
             AppState.get().users.add(user);
             data.add(user);
+            DataStore.saveUsers();   // persist user list
         });
     }
 
@@ -42,17 +50,22 @@ public class AdminController {
     private void handleDelete() {
         User sel = usersList.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
         if (confirm("Delete user '" + sel.username + "'?")) {
             AppState.get().users.remove(sel);
             data.remove(sel);
+            DataStore.saveUsers();   // persist user list
         }
     }
 
     @FXML
-    private void handleBack() { Photos.switchScene("/photos/view/login.fxml", "Photos - Login"); }
+    private void handleBack() {
+        Photos.switchScene("/photos/view/login.fxml", "Photos - Login");
+    }
 
     private boolean confirm(String msg) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.OK, ButtonType.CANCEL);
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg,
+                ButtonType.OK, ButtonType.CANCEL);
         return a.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
     }
 }
