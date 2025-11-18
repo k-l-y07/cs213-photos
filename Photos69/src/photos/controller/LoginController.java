@@ -6,7 +6,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import photos.Photos;
 import photos.model.AppState;
-import photos.model.DataStore;
 import photos.model.User;
 
 /**
@@ -37,17 +36,15 @@ public class LoginController {
             return;
         }
 
-        // Find user or create if missing (you can change this later
-        // if you want only admin to create users)
+        // Find existing user; do NOT auto-create users on login.
         User user = AppState.get().users.stream()
                 .filter(x -> x.username.equals(u))
                 .findFirst()
                 .orElse(null);
 
         if (user == null) {
-            user = new User(u);
-            AppState.get().users.add(user);
-            DataStore.saveUsers();   // persist new user
+            new Alert(Alert.AlertType.ERROR, "User not found. Ask admin to create the account.").showAndWait();
+            return;
         }
 
         AppState.get().currentUser = user;
