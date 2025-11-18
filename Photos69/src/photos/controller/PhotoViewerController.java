@@ -4,9 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.ScrollPane;
 import photos.Photos;
 import photos.model.*;
-import photos.model.DataStore;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -22,12 +22,12 @@ import java.util.List;
  * <p>Authors: Wilmer Joya, Kenneth Yan</p>
  */
 public class PhotoViewerController {
-    private static int startIndex = 0;
 
+    private static int startIndex = 0;
     public static void setStartIndex(int i) { startIndex = i; }
 
     @FXML private ImageView imageView;
-    @FXML private javafx.scene.control.ScrollPane scrollPane;
+    @FXML private ScrollPane scrollPane;
     @FXML private Label captionLabel;
     @FXML private Label dateLabel;
     @FXML private Label tagsLabel;
@@ -49,11 +49,24 @@ public class PhotoViewerController {
             Photos.switchScene("/photos/view/user_home.fxml", "Photos - Albums");
             return;
         }
+
         photos = album.photos;
-        index = Math.max(0, Math.min(startIndex, photos.size()-1));
-        // ensure image scales to viewport while preserving ratio
+        if (photos.isEmpty()) {
+            // nothing to show, just go back
+            Photos.switchScene("/photos/view/album.fxml", "Album - " + album.name);
+            return;
+        }
+
+        index = Math.max(0, Math.min(startIndex, photos.size() - 1));
+
+        // Make sure the image scales nicely
         imageView.setPreserveRatio(true);
+
         if (scrollPane != null) {
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+
+            // Bind ImageView size to viewport so it never explodes past the window
             scrollPane.viewportBoundsProperty().addListener((obs, oldB, newB) -> {
                 if (newB != null) {
                     imageView.setFitWidth(newB.getWidth());
@@ -66,16 +79,41 @@ public class PhotoViewerController {
     }
 
     private void showPhoto() {
-        if (photos.isEmpty()) return;
+        if (photos == null || photos.isEmpty()) {
+            imageView.setImage(null);
+            captionLabel.setText("");
+            dateLabel.setText("");
+            tagsLabel.setText("");
+            prevBtn.setDisable(true);
+            nextBtn.setDisable(true);
+            return;
+        }
+
         Photo p = photos.get(index);
         try {
-            Image img = new Image(new File(p.path).toURI().toString());
+            // Limit the loaded image size so it doesn't blow up the stage
+            Image img = new Image(
+                    new File(p.path).toURI().toString(),
+                    1600, 900,      // max width / height for display
+                    true, true      // preserveRatio, smooth
+            );
             imageView.setImage(img);
         } catch (Exception e) {
             imageView.setImage(null);
         }
-        captionLabel.setText(p.caption == null || p.caption.isEmpty() ? new File(p.path).getName() : p.caption);
-        dateLabel.setText(sdf.format(p.date));
+
+        captionLabel.setText(
+                (p.caption == null || p.caption.isEmpty())
+                        ? new File(p.path).getName()
+                        : p.caption
+        );
+
+        if (p.date != null) {
+            dateLabel.setText(sdf.format(p.date));
+        } else {
+            dateLabel.setText("Unknown date");
+        }
+
         tagsLabel.setText(p.tags.isEmpty() ? "No tags" : p.tags.toString());
 
         prevBtn.setDisable(index <= 0);
@@ -106,13 +144,10 @@ public class PhotoViewerController {
         d.setContentText("Caption:");
         d.showAndWait().ifPresent(s -> {
             p.caption = s.trim();
-            refresh();
+            showPhoto();
             DataStore.saveUsers();
         });
     }
-
-    // helper to refresh displayed fields
-    private void refresh() { showPhoto(); }
 
     @FXML
     private void handleTags() {
@@ -136,11 +171,11 @@ public class PhotoViewerController {
                     if (!exists) {
                         p.tags.add(tag);
                         DataStore.saveUsers();
-                        refresh();
+                        showPhoto();
                     }
                 }
             });
-        } else {
+        } else { // Delete Tag
             if (p.tags.isEmpty()) {
                 new Alert(Alert.AlertType.INFORMATION, "This photo has no tags.").showAndWait();
                 return;
@@ -151,7 +186,7 @@ public class PhotoViewerController {
             del.showAndWait().ifPresent(t -> {
                 p.tags.remove(t);
                 DataStore.saveUsers();
-                refresh();
+                showPhoto();
             });
         }
     }
